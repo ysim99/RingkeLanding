@@ -1,0 +1,32 @@
+.rklp{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.rklp_title h1{
+    font-size: 100px;
+    height: 100vh;
+}
+
+.rklp_section{
+    margin-bottom: 10vh;
+}
+
+.rklp_flex_c{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rklp_grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5vh;
+}
+
+.rklp_grid div {
+    width: 20vw;
+    height: 20vw;
+    background-color: rgb(34, 34, 34);
+}
