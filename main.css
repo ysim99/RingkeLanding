@@ -4,9 +4,13 @@
     box-sizing: border-box;
 }
 
-.rklp_title h1{
+.rklp_title_container{
     font-size: 100px;
     height: 100vh;
+}
+
+.rklp_title_container h1{
+    text-align: center;
 }
 
 .rklp_section{
@@ -17,6 +21,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.rklp_flex_sa{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.rklp_flex_col{
+    flex-direction: column;
+}
+
+.rklp_page_arrow{
+    font-size: 60px;
 }
 
 .rklp_grid{
