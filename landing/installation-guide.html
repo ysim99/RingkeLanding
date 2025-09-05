@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Horizontal Slide Website</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden; /* prevent vertical scrollbars */
+      font-family: Montserrat;
+    }
+
+    h1{
+        font-size: 150px;
+        text-align: end;
+    }
+
+    main {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    main::-webkit-scrollbar {
+        display: none; /* Chrome, Safari */
+    }
+
+    section {
+      flex: 0 0 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+
+    .product-selector-container {
+    position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 40vw;
+      height: 100vh;
+      top: 5vh;
+    }
+  </style>
+
+</head>
+<body>
+  <main id="slides">
+    <section class="slide-1r">
+        <div class="product-selector-container">
+            <div class="canvas-container"><canvas id="canvas"></canvas></div>
+            <div><h1>Installation<br/>Guide</h1></div>
+        </div>
+    </section>
+    <section class="slide-2">
+        <div class="filter">
+            <input type="text" placeholder="device">
+        </div>
+        <button>Search</button>
+    </section>
+    <section class="slide-3">
+
+    </section>
+  </main>
+
+  <nav>
+    <button id="prev">← Prev</button>
+    <button id="next">Next →</button>
+  </nav>
+
+
+<script>
+
+//Helper functions
+//easeInoutAnimation
+function easeInOutQuad(t) {
+    return t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+}
+
+//lerp function
+function lerp(p0, p1, t) {
+    return p0 + (p1 - p0) * t;
+}
+
+
+//canvas setup
+var canvas = document.querySelector('canvas');
+canvas.width = window.innerWidth * 0.4;
+canvas.height = window.innerHeight;
+var ctx = canvas.getContext('2d');
+
+//Path functions
+function pathCover(ctx) {
+        ctx.beginPath();
+
+        // cover top-handle
+        ctx.moveTo(423, 51);
+        ctx.lineTo(423, 20);
+        ctx.lineTo(102, 195);
+        ctx.lineTo(101, 232);
+        ctx.lineTo(423, 51);
+
+        // cover main
+        ctx.lineTo(449, 68);
+        ctx.lineTo(128, 251);
+        ctx.lineTo(100, 235);
+        ctx.lineTo(99, 612);
+        ctx.lineTo(127, 632);
+
+        ctx.moveTo(283, 546);
+        ctx.lineTo(127, 632);
+        ctx.lineTo(128, 251);
+        ctx.lineTo(449, 68);
+        ctx.lineTo(450, 145);
+
+        // cover top hole
+        ctx.moveTo(253, 126);
+        ctx.lineTo(284, 107);
+        ctx.bezierCurveTo(292, 107, 290, 115, 285, 117);
+        ctx.lineTo(256, 134);
+        ctx.bezierCurveTo(251, 138, 245, 130, 253, 126);
+
+        // cover left three circles
+        ctx.moveTo(112, 472);
+        ctx.ellipse(112, 472, 6, 10, -Math.PI * 0.08, 0, Math.PI * 2);
+
+        ctx.moveTo(112, 495);
+        ctx.ellipse(112, 495, 6, 10, -Math.PI * 0.08, 0, Math.PI * 2);
+
+        ctx.moveTo(112, 519);
+        ctx.ellipse(112, 519, 6, 10, -Math.PI * 0.08, 0, Math.PI * 2);
+    }
+function pathIphone(ctx) {
+        ctx.beginPath();
+
+        // iphone inner
+        ctx.moveTo(316, 705);
+        ctx.quadraticCurveTo(311, 705, 311, 700);
+        ctx.lineTo(310, 390);
+        ctx.quadraticCurveTo(309, 378, 321, 372);
+        ctx.lineTo(444, 304);
+        ctx.quadraticCurveTo(449, 303, 450, 309);
+
+        // iphone second
+        ctx.moveTo(301, 701);
+        ctx.lineTo(301, 385);
+        ctx.quadraticCurveTo(300, 373, 316, 366);
+        ctx.lineTo(439, 297);
+        ctx.quadraticCurveTo(449, 290, 448, 304);
+
+        // iphone third
+        ctx.moveTo(291, 695);
+        ctx.lineTo(293, 382);
+        ctx.quadraticCurveTo(293, 368, 304, 364);
+        ctx.lineTo(437, 291);
+        ctx.quadraticCurveTo(444, 288, 444, 294);
+
+        // iphone outside
+        ctx.moveTo(450, 309);
+        ctx.lineTo(450, 620);
+        ctx.quadraticCurveTo(450, 626, 441, 631);
+        ctx.lineTo(312, 707);
+        ctx.quadraticCurveTo(306, 706, 303, 704);
+        ctx.lineTo(287, 693);
+        ctx.quadraticCurveTo(285, 692, 285, 689);
+        ctx.lineTo(286, 377);
+        ctx.quadraticCurveTo(285, 362, 300, 356);
+        ctx.lineTo(423, 289);
+        ctx.quadraticCurveTo(437, 282, 439, 290);
+
+        // camera hole
+        ctx.moveTo(385, 353);
+        ctx.ellipse(382, 353, 3.4, 4, -Math.PI * 0.08, 0, Math.PI * 2);
+    }
+function pathIpad(ctx) {
+        ctx.beginPath();
+
+        //iPad outside
+        ctx.moveTo(397, 296);
+        ctx.lineTo(396, 135);
+        ctx.quadraticCurveTo(397, 118, 416, 132);
+        ctx.lineTo(691, 294);
+        ctx.quadraticCurveTo(705, 300, 702, 320);
+        ctx.lineTo(702, 321);
+        ctx.lineTo(702, 640);
+        ctx.quadraticCurveTo(698, 658, 678, 645);
+        ctx.lineTo(454, 506);
+        //iPad middle
+        ctx.moveTo(396, 135);
+        ctx.quadraticCurveTo(399, 130, 405, 134);
+        ctx.lineTo(684, 300);
+        ctx.quadraticCurveTo(695, 305, 694, 321);
+        ctx.lineTo(694, 641);
+        ctx.quadraticCurveTo(695, 652, 682, 647);
+        //iPad inner
+        ctx.moveTo(400, 295);
+        ctx.lineTo(402, 149);
+        ctx.quadraticCurveTo(401, 136, 413, 145);
+        ctx.lineTo(678, 304);
+        ctx.quadraticCurveTo(688, 309, 687, 321);
+        ctx.lineTo(688, 628);
+        ctx.quadraticCurveTo(688, 645, 670, 632);
+        ctx.lineTo(454, 496);
+        }
+
+// Draw function
+function drawCover(ctx) {
+    pathCover(ctx);
+    ctx.stroke();
+}
+function drawIphone(ctx) {
+    pathIphone(ctx);
+    ctx.stroke();
+}
+function drawIpad(ctx) {
+    pathIpad(ctx);
+    ctx.stroke();
+}
+
+// On hover detection
+let isCover = false;
+let isIphone = false;
+let isIpad = false;
+
+function hitTestCover(x, y) {
+    ctx.save();
+    pathCover(ctx);
+    const result = ctx.isPointInPath(x, y) || ctx.isPointInStroke(x, y);
+    ctx.restore();
+    return result;
+}
+function hitTestIphone(x, y) {
+    ctx.save();
+    pathIphone(ctx);
+    const result = ctx.isPointInPath(x, y) || ctx.isPointInStroke(x, y);
+    ctx.restore();
+    return result;
+}
+function hitTestIpad(x, y) {
+    ctx.save();
+    pathIpad(ctx);
+    const result = ctx.isPointInPath(x, y) || ctx.isPointInStroke(x, y);
+    ctx.restore();
+    return result;
+}
+
+canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    if (hitTestIphone(mouseX, mouseY)) {
+        if(isIphone) return;
+        console.log("Hovering Iphone!");
+        animateIphone(80, 80);
+    }
+
+    else if (hitTestIpad(mouseX, mouseY)) {
+        if(isIpad) return;
+        console.log("Hovering Ipad!");
+        animateIpad();
+    }
+
+    else if (hitTestCover(mouseX, mouseY)) {
+        if(isCover) return;
+        console.log("Hovering Cover!");
+        animateCover();
+    }
+});
+
+// Animation
+function animateIphone(dx, dy, duration = 1000) {
+    isIphone = true;
+    isIpad = false;
+    isCover = false;
+    const startTime = performance.now();
+    const startX = dx;
+    const startY = dy;
+
+    function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1); // 0 → 1
+        const ease = easeInOutQuad(t);
+
+        const currentX = startX * (1 - ease);
+        const currentY = startY * (1 - ease);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        drawCover(ctx);
+        drawIpad(ctx);
+        
+        ctx.save();
+        ctx.shadowColor = "rgba(255, 77, 0)";
+        ctx.shadowBlur = 40 * (t * t);
+        drawIphone(ctx);
+       
+        ctx.beginPath();
+        ctx.moveTo(337 + currentX, 404 + currentY);
+        ctx.quadraticCurveTo(339 + currentX, 394 + currentY, 344 + currentX, 393 + currentY);
+        ctx.lineTo(468 + currentX, 324 + currentY);
+        ctx.quadraticCurveTo(476 + currentX, 320 + currentY, 476 + currentX, 328 + currentY);
+        ctx.lineTo(476 + currentX, 637 + currentY);
+        ctx.quadraticCurveTo(476 + currentX, 646 + currentY, 469 + currentX, 649 + currentY);
+        ctx.lineTo(340 + currentX, 724 + currentY);
+        ctx.quadraticCurveTo(336 + currentX, 725 + currentY, 337 + currentX, 713 + currentY);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+
+        if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+function animateIpad(duration = 1000) {
+    isIphone = false;
+    isIpad = true;
+    isCover = false;
+    const startTime = performance.now();
+
+    // Start coordinates
+    const start = {
+        a: [534, 224],
+        b: [576, 389, 686, 492],          // quadratic: [controlX, controlY, endX, endY]
+        c: [530, 216],
+        d: [540, 474, 454, 369, 686, 492] // cubic: [cp1x, cp1y, cp2x, cp2y, endX, endY]
+    };
+
+    // End coordinates
+    const end = {
+        a: [670, 304],
+        b: [673, 318, 686, 330],
+        c: [670, 299],
+        d: [670, 330, 664, 311, 686, 330]
+    };
+
+    function lerp(p0, p1, t) {
+        // Linear interpolation for numbers or arrays
+        if (Array.isArray(p0)) return p0.map((v, i) => v + (p1[i] - v) * t);
+        return p0 + (p1 - p0) * t;
+    }
+
+    function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        const ease = easeInOutQuad(t);
+
+        const a = lerp(start.a, end.a, ease);
+        const b = lerp(start.b, end.b, ease);
+        const c = lerp(start.c, end.c, ease);
+        const d = lerp(start.d, end.d, ease);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawCover(ctx);
+        drawIphone(ctx);
+
+        ctx.save();
+        ctx.shadowColor = "rgba(255, 77, 0)";
+        ctx.shadowBlur = 40 * t;
+        drawIpad(ctx);
+
+        // Draw iPad morphing curves
+        ctx.beginPath();
+        ctx.moveTo(...a);
+        ctx.quadraticCurveTo(b[0], b[1], b[2], b[3]);
+        ctx.moveTo(...c);
+        ctx.bezierCurveTo(d[0], d[1], d[2], d[3], d[4], d[5]);
+        ctx.stroke();
+        ctx.restore();
+        if (t < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+}
+function animateCover(duration = 1000) {
+    isIphone = false;
+    isIpad = false;
+    isCover = true;
+    const startTime = performance.now();
+
+    const coverStart = [
+    {type: "moveTo", points: [123, 247]},
+    {type: "lineTo", points: [123, 245]},
+    {type: "quadraticCurveTo", points: [121, 241, 127, 236]},
+    {type: "lineTo", points: [435, 59]},
+    {type: "quadraticCurveTo", points: [442, 59, 441, 71]},
+    {type: "lineTo", points: [441, 71]}
+];
+
+const coverEnd = [
+    {type: "moveTo", points: [123, 247]},
+    {type: "lineTo", points: [123, 180]},
+    {type: "quadraticCurveTo", points: [121, 175, 127, 173]},
+    {type: "lineTo", points: [438, 5]},
+    {type: "quadraticCurveTo", points: [442, 5, 441, 32]},
+    {type: "lineTo", points: [441, 72]}
+];
+
+    function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        const ease = easeInOutQuad(t);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawIpad(ctx);
+        drawIphone(ctx);
+
+        ctx.save();
+        ctx.shadowColor = "rgba(255, 77, 0)";
+        ctx.shadowBlur = 40 * ease;
+        drawCover(ctx);
+
+        // Draw morphed path
+        ctx.beginPath();
+        for (let i = 0; i < coverStart.length; i++) {
+            const startSeg = coverStart[i];
+            const endSeg = coverEnd[i];
+
+            const interpolatedPoints = startSeg.points.map((p, idx) => 
+                lerp(p, endSeg.points[idx], ease)
+            );
+
+            switch(startSeg.type) {
+                case "moveTo": ctx.moveTo(...interpolatedPoints); break;
+                case "lineTo": ctx.lineTo(...interpolatedPoints); break;
+                case "quadraticCurveTo": ctx.quadraticCurveTo(...interpolatedPoints); break;
+                case "bezierCurveTo": ctx.bezierCurveTo(...interpolatedPoints); break;
+            }
+        }
+        ctx.fillStyle = "rgba(255,255,255, 0.7)";
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        if(t < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+}
+
+
+//draw all
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "black";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.shadowColor = "#39ff14";
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    drawCover(ctx);
+    drawIpad(ctx);
+    drawIphone(ctx);
+}
+
+document.addEventListener("DOMContentLoaded", draw);
+
+document.querySelector(".start").addEventListener("click", function() {
+    animateIphone(80, 80);
+});
+
+</script>
+
+ <script type="module">
+  const slides = document.querySelector("#slides");
+  const sections = [...slides.querySelectorAll("section")];
+  let current = 0;
+  let isAnimating = false; // declare it!
+
+  const goToSlide = (index) => {
+    if (isAnimating) return; // block input
+    if (index < 0 || index >= sections.length) return;
+
+    isAnimating = true;
+    sections[index].scrollIntoView({ behavior: "smooth", inline: "start" });
+  };
+
+  document.getElementById("prev").addEventListener("click", () => goToSlide(current - 1));
+  document.getElementById("next").addEventListener("click", () => goToSlide(current + 1));
+
+  // Keyboard support
+  window.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
+    if (key === "arrowright" || key === "d") {
+      e.preventDefault();
+      goToSlide(current + 1);
+    }
+    if (key === "arrowleft" || key === "a") {
+      e.preventDefault();
+      goToSlide(current - 1);
+    }
+  });
+
+  // Observer: update current + unlock
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        current = sections.indexOf(entry.target);
+        isAnimating = false; // unlock only when the slide has snapped in
+      }
+    });
+  }, { threshold: 0.6 });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>
